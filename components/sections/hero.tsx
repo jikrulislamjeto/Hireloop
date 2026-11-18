@@ -28,7 +28,7 @@ export function Hero() {
       {/* Purple swirl backdrop from the Figma hero art */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-cover bg-center opacity-35 [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,black,transparent_75%)]"
+        className="pointer-events-none absolute inset-0 -z-10 bg-cover bg-center opacity-35 mask-[radial-gradient(ellipse_60%_60%_at_50%_0%,black,transparent_75%)]"
         style={{ backgroundImage: "url('/hero-bg.png')" }}
       />
       <div
