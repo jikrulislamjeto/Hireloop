@@ -3,7 +3,13 @@
 
 import Link from "next/link"
 import { useState, type FormEvent } from "react"
-import { EyeIcon, EyeOffIcon } from "lucide-react"
+import {
+  BriefcaseIcon,
+  EyeIcon,
+  EyeOffIcon,
+  ShieldCheckIcon,
+  UsersIcon,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -13,12 +19,41 @@ import { cn } from "@/lib/utils"
 
 type Mode = "signin" | "signup"
 
+export type UserRole = "seeker" | "recruiter" | "admin"
+
 export type AuthFormData = {
   name?: string
   email: string
   password: string
+  role?: UserRole
   remember?: string
 }
+
+const roles: Array<{
+  value: UserRole
+  label: string
+  description: string
+  icon: typeof BriefcaseIcon
+}> = [
+  {
+    value: "seeker",
+    label: "Seeker",
+    description: "Looking for a job",
+    icon: BriefcaseIcon,
+  },
+  {
+    value: "recruiter",
+    label: "Recruiter",
+    description: "Hiring talent",
+    icon: UsersIcon,
+  },
+  {
+    value: "admin",
+    label: "Admin",
+    description: "Manage platform",
+    icon: ShieldCheckIcon,
+  },
+]
 
 type AuthFormProps = {
   mode: Mode
@@ -48,6 +83,7 @@ export function AuthForm({ mode, onSubmit }: AuthFormProps) {
       name: formData.get("name")?.toString(),
       email: formData.get("email")?.toString() ?? "",
       password: formData.get("password")?.toString() ?? "",
+      role: (formData.get("role")?.toString() as UserRole | undefined) ?? undefined,
       remember: formData.get("remember")?.toString(),
     }
 
@@ -122,6 +158,40 @@ export function AuthForm({ mode, onSubmit }: AuthFormProps) {
               className="h-10 px-3"
             />
           </div>
+        )}
+
+        {!isSignIn && (
+          <fieldset className="flex flex-col gap-2">
+            <legend className="mb-2 text-sm font-medium">I am joining as</legend>
+
+            <div className="grid grid-cols-3 gap-2">
+              {roles.map((role) => {
+                const Icon = role.icon
+
+                return (
+                  <label key={role.value} className="cursor-pointer">
+                    <input
+                      type="radio"
+                      name="role"
+                      value={role.value}
+                      defaultChecked={role.value === "seeker"}
+                      className="peer sr-only"
+                    />
+
+                    <span className="flex h-full flex-col items-center gap-1.5 rounded-xl border border-input bg-transparent p-3 text-center text-muted-foreground transition-colors hover:border-ring/60 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-foreground peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50">
+                      <Icon className="size-4" aria-hidden />
+
+                      <span className="text-sm font-medium">{role.label}</span>
+
+                      <span className="text-[11px] leading-tight text-muted-foreground">
+                        {role.description}
+                      </span>
+                    </span>
+                  </label>
+                )
+              })}
+            </div>
+          </fieldset>
         )}
 
         <div className="flex flex-col gap-2">

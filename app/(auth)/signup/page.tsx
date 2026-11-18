@@ -15,6 +15,7 @@ export default function SignUpPage() {
         name: data.name as string,
         email: data.email,
         password: data.password,
+        role: data.role ?? "seeker",
         callbackURL: "/",
       })
 
