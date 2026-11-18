@@ -1,19 +1,31 @@
-import type { Metadata } from "next"
+"use client"
+// import type { Metadata } from "next"
 
-import { AuthForm } from "@/components/auth/auth-form"
+import { AuthForm, AuthFormData } from "@/components/auth/auth-form"
+import { authClient } from "@/lib/auth-client"
 
-export const metadata: Metadata = {
-  title: "Sign In — HireLoop",
-}
+// export const metadata: Metadata = {
+//   title: "Sign In — HireLoop",
+// }
 
 export default function SignInPage() {
+
+  const handleSignIn = async (data: AuthFormData) => {
+    const { data: SignInResponse, error } = await authClient.signIn.email({
+      email: data.email, // required, The email address of the user.
+      password: data.password, // required, The password of the user. It should be at least 8 characters long and max 128 by default.
+      rememberMe: true, // If false, the user will be signed out when the browser is closed. (optional) (default: true)
+      callbackURL: "/", // An optional URL to redirect to after the user signs in. (optional)
+    });
+    console.log("Sign In Response", SignInResponse, error);
+  }
   return (
     <main className="relative flex min-h-[calc(100svh-4rem)] items-center justify-center px-4 py-12">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-96 bg-[radial-gradient(ellipse_60%_100%_at_50%_0%,--theme(--color-primary/15%),transparent)]"
       />
-      <AuthForm mode="signin" />
+      <AuthForm mode="signin" onSubmit={handleSignIn} />
     </main>
   )
 }
