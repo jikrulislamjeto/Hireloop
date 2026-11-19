@@ -9,6 +9,7 @@ import {
     ClipboardList,
     CreditCard,
     LayoutDashboard,
+    PlusCircle,
     Settings,
     Users,
     type LucideIcon,
@@ -92,6 +93,12 @@ export const menuItemsByRole: Record<DashboardRole, MenuItem[]> = {
             name: "Manage Jobs",
             url: "/dashboard/recruiter/jobs",
             icon: Briefcase,
+        },
+        {
+            id: "recruiter-add-jobs",
+            name: "Add Job",
+            url: "/dashboard/recruiter/jobs/new",
+            icon: PlusCircle,
         },
         {
             id: "recruiter-applications",

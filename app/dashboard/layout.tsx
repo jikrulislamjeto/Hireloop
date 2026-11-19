@@ -1,7 +1,16 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { DashboardSidebar } from "../components/DashboardSidebar";
+import { redirect } from "next/navigation"
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { DashboardSidebar } from "../components/DashboardSidebar"
+import { getSession } from "@/lib/session"
+
+const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
+    const session = await getSession()
+
+    if (!session) {
+        redirect("/signin")
+    }
+
     return (
         <SidebarProvider>
             <DashboardSidebar />
