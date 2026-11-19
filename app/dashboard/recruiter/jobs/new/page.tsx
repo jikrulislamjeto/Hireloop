@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
+import { createJob } from "@/lib/actions/jobs"
 
 const jobCategories = [
     "Engineering & Tech",
@@ -35,17 +36,37 @@ const jobTypes = ["Full-time", "Part-time", "Contract", "Internship"]
 const salaryFrequencies = ["per hour", "per day", "per week", "per month", "per year"]
 
 export default function NewJobPage() {
-    const [submitted, setSubmitted] = useState(false)
+    const [status, setStatus] = useState<{ success: boolean; message: string } | null>(null)
+    const [isPublishing, setIsPublishing] = useState(false)
+    // Changing the key remounts the form so every field (including the Base UI
+    // select and switch) goes back to its default after a successful publish.
+    const [formKey, setFormKey] = useState(0)
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        const data = Object.fromEntries(new FormData(event.currentTarget))
+        const form = event.currentTarget
 
-        // TODO: replace with real job creation request
-        console.log("[job] new job data:", data)
-        setSubmitted(true)
+        setIsPublishing(true)
+        setStatus(null)
 
+        try {
+            const result = await createJob(new FormData(form))
+
+            if (result.success) {
+                setFormKey((key) => key + 1)
+                setStatus({ success: true, message: "Job published successfully." })
+            } else {
+                setStatus({ success: false, message: result.error })
+            }
+        } catch {
+            setStatus({
+                success: false,
+                message: "Something went wrong while publishing the job. Please try again.",
+            })
+        } finally {
+            setIsPublishing(false)
+        }
     }
 
     return (
@@ -71,7 +92,7 @@ export default function NewJobPage() {
                 network.
             </p>
 
-            <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-6">
+            <form key={formKey} onSubmit={handleSubmit} className="mt-8 flex flex-col gap-6">
                 {/* 1. Basic Information */}
                 <section className="rounded-2xl border bg-card p-5 sm:p-6">
                     <h2 className="font-heading text-lg font-semibold">
@@ -254,9 +275,16 @@ export default function NewJobPage() {
                     </div>
                 </section>
 
-                {submitted && (
-                    <p role="status" className="text-sm text-muted-foreground">
-                        Job data captured — check the browser console.
+                {status && (
+                    <p
+                        role={status.success ? "status" : "alert"}
+                        className={
+                            status.success
+                                ? "text-sm text-primary"
+                                : "text-sm text-destructive"
+                        }
+                    >
+                        {status.message}
                     </p>
                 )}
 
@@ -268,8 +296,13 @@ export default function NewJobPage() {
                     >
                         Cancel
                     </Button>
-                    <Button type="submit" size="lg" className="font-heading">
-                        Publish Job
+                    <Button
+                        type="submit"
+                        size="lg"
+                        className="font-heading"
+                        disabled={isPublishing}
+                    >
+                        {isPublishing ? "Publishing…" : "Publish Job"}
                     </Button>
                 </div>
             </form>

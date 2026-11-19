@@ -1,9 +1,7 @@
 import { betterAuth } from "better-auth";
-import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 
-const client = new MongoClient(process.env.BETTER_AUTH_DB_URI as string);
-const db = client.db('hireloopdb');
+import { getDb, getMongoClient } from "@/lib/mongodb";
 
 export const auth = betterAuth({
     user: {
@@ -25,7 +23,7 @@ export const auth = betterAuth({
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
         },
     },
-    database: mongodbAdapter(db, {
-        client,
+    database: mongodbAdapter(getDb(), {
+        client: getMongoClient(),
     }),
 });
