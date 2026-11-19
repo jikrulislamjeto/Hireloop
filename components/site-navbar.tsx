@@ -15,6 +15,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
+import { useSession, signOut } from "@/lib/auth-client"
 
 const navLinks = [
   { label: "Browse Jobs", href: "/jobs" },
@@ -79,6 +80,11 @@ function NavLink({
 export function SiteNavbar() {
   const pathname = usePathname()
 
+  const { data: session, isPending } = useSession()
+
+  const handleSignOut = async () => {
+    await signOut()
+  }
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
@@ -97,10 +103,29 @@ export function SiteNavbar() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Button variant="ghost" nativeButton={false} render={<Link href="/signin" />}>
-            Sign In
-          </Button>
-          <Button nativeButton={false} render={<Link href="/signup" />}>Get Started</Button>
+          {isPending ? null : session?.user ? (
+            <>
+              <span className="text-sm font-medium">
+                Welcome, {session.user.name}
+              </span>
+              <Button onClick={handleSignOut} variant="ghost">
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                nativeButton={false}
+                render={<Link href="/signin" />}
+              >
+                Sign In
+              </Button>
+              <Button nativeButton={false} render={<Link href="/signup" />}>
+                Get Started
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile nav */}
@@ -147,21 +172,25 @@ export function SiteNavbar() {
                 ))}
               </nav>
               <div className="mt-auto flex flex-col gap-2 p-4">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  nativeButton={false}
-                  render={<Link href="/signin" />}
-                >
-                  Sign In
-                </Button>
-                <Button
-                  className="w-full"
-                  nativeButton={false}
-                  render={<Link href="/signup" />}
-                >
-                  Get Started
-                </Button>
+                {session?.user ?
+                  <span className="text-sm font-medium">Welcome, {session.user.name}</span>
+                  : <>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      nativeButton={false}
+                      render={<Link href="/signin" />}
+                    >
+                      Sign In
+                    </Button>
+                    <Button
+                      className="w-full"
+                      nativeButton={false}
+                      render={<Link href="/signup" />}
+                    >
+                      Get Started
+                    </Button>
+                  </>}
               </div>
             </SheetContent>
           </Sheet>

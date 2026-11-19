@@ -3,12 +3,16 @@
 
 import { AuthForm, type AuthFormData } from "@/components/auth/auth-form"
 import { authClient } from "@/lib/auth-client"
+import { useRouter } from "next/navigation"
 
 // export const metadata: Metadata = {
 //   title: "Sign Up — HireLoop",
 // }
 
 export default function SignUpPage() {
+
+  const router = useRouter();
+
   async function handleSignUp(data: AuthFormData) {
     const { data: signUpResponse, error } =
       await authClient.signUp.email({
@@ -21,6 +25,9 @@ export default function SignUpPage() {
 
     if (error) {
       throw new Error(error.message || "Failed to create your account.")
+    }
+    else {
+      router.push("/");
     }
 
     console.log("Sign Up Response:", signUpResponse)
